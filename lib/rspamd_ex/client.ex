@@ -31,7 +31,7 @@ defmodule RspamdEx.Client do
          encoded_json <- remove_first_line(stdout),
          {:ok, scan_results} <- Jason.decode(encoded_json, keys: :atoms),
          :ok <- delete_file(file_path, Keyword.get(state, :delete)) do
-      {:reply, {:ok, struct(Rspamd.Client.ScanResults, scan_results)}, state}
+      {:reply, {:ok, struct(RspamdEx.Client.ScanResults, scan_results)}, state}
     else
       {:error, error} ->
         Logger.error("Unable to open file path due to #{to_string(error)}")
