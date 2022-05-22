@@ -13,6 +13,10 @@ defmodule RspamdEx.Client.ScanResults do
             time_real: 0.0
 
   def spam?(%__MODULE__{} = results) do
-    results.required_score >= results.score
+    results.required_score < results.score
+  end
+
+  def ham?(%__MODULE__{} = results) do
+    !spam?(results)
   end
 end
