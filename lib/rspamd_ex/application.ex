@@ -6,6 +6,7 @@ defmodule RspamdEx.Application do
       RspamdEx.Client
     ]
 
+    File.mkdir_p(Application.fetch_env!(:rspamd_ex, :path))
     Supervisor.start_link(children, strategy: :one_for_one, name: __MODULE__)
   end
 end

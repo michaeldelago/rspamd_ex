@@ -27,8 +27,7 @@ defmodule RspamdEx.Client do
     file_path = [path, hash] |> Enum.join("/")
 
     with :ok <- write_file(message, file_path),
-         {stdout, 0} <- run_command(state, file_path),
-         encoded_json <- remove_first_line(stdout),
+         {encoded_json, 0} <- run_command(state, file_path),
          {:ok, scan_results} <- Jason.decode(encoded_json, keys: :atoms),
          :ok <- delete_file(file_path, Keyword.get(state, :delete)) do
       {:reply, {:ok, struct(RspamdEx.Client.ScanResults, scan_results)}, state}
@@ -41,12 +40,6 @@ defmodule RspamdEx.Client do
         Logger.error(["rspamc exited with error code ", n, "and output ", out])
         {:reply, {:error, :rspamc_error}, state}
     end
-  end
-
-  defp remove_first_line(string) when is_binary(string) do
-    String.split(string, "\n")
-    |> Enum.drop(1)
-    |> Enum.join("")
   end
 
   defp delete_file(path, delete_enabled) do
