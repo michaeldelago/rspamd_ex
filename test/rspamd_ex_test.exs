@@ -1,8 +1,12 @@
 defmodule RspamdExTest do
   use ExUnit.Case
-  doctest RspamdEx
+  doctest RspamdEx.Client
 
-  test "greets the world" do
-    assert RspamdEx.hello() == :world
+  test "Can scan a basic message and return the struct" do
+    message = """
+    foobar
+    """
+
+    assert {:ok, %RspamdEx.Client.ScanResults{}} = RspamdEx.Client.scan_message(message)
   end
 end
