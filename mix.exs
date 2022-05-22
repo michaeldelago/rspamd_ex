@@ -16,7 +16,7 @@ defmodule RspamdEx.MixProject do
     [
       mod: {RspamdEx.Application, []},
       extra_applications: [:logger, :crypto],
-      env: [host: "localhost", port: 11334, delete: false],
+      env: [host: "localhost", port: 11334, delete: false, executable: "rspamd"],
       registered: [RspamdEx.Client]
     ]
   end
