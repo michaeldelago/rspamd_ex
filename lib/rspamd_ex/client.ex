@@ -21,19 +21,43 @@ defmodule RspamdEx.Client do
     GenServer.call(__MODULE__, {:scan, message})
   end
 
+  def scan_file(filename) do
+    if File.exists?(filename) do
+      GenServer.call(__MODULE__, {:scan_file, filename})
+    else
+      Logger.error(["File ", filename, " doesn't appear to exist."])
+      {:error, :enoent}
+    end
+  end
+
   def handle_call({:scan, message}, _from, state) when is_binary(message) do
     hash = :crypto.hash(:sha, message) |> Base.url_encode64() |> String.slice(0, 20)
     path = Keyword.get(state, :path)
     file_path = [path, hash] |> Enum.join("/")
 
-    with :ok <- write_file(message, file_path),
-         {encoded_json, 0} <- run_command(state, file_path),
+    case write_file(message, file_path) do
+      :ok ->
+        scan_path(file_path, state)
+
+      {:error, error} ->
+        Logger.error(["Unable to write file due to ", inspect(error)])
+        {:reply, {:error, error}, state}
+    end
+  end
+
+  def handle_call({:scan_file, filename}, _from, state) do
+    scan_path(filename, state)
+  end
+
+  defp scan_path(filename, state) do
+    Logger.debug(["Scanning file at path ", filename])
+    with {encoded_json, 0} <- run_command(state, filename),
          {:ok, scan_results} <- Jason.decode(encoded_json, keys: :atoms),
-         :ok <- delete_file(file_path, Keyword.get(state, :delete)) do
+         :ok <- delete_file(filename, Keyword.get(state, :delete)) do
       {:reply, {:ok, struct(RspamdEx.Client.ScanResults, scan_results)}, state}
     else
       {:error, error} ->
-        Logger.error("Unable to open file path due to #{to_string(error)}")
+        Logger.error(["Unable to open file path due to ", inspect(error)])
         {:reply, {:error, error}, state}
 
       {out, n} when is_integer(n) and is_binary(out) ->
@@ -53,8 +77,10 @@ defmodule RspamdEx.Client do
   defp run_command(state, filepath) do
     if Keyword.has_key?(state, :password) do
       System.cmd(Keyword.get(state, :executable), [
-        "-j",
-        "-P",
+        "--json",
+        "--password",
+        "--connect",
+        "#{Keyword.get(state, :host)}:#{Keyword.get(state, :port)}",
         Keyword.get(state, :password),
         "symbols",
         filepath

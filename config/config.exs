@@ -4,4 +4,6 @@ config :rspamd_ex,
   host: "localhost",
   port: 11334,
   delete: true,
-  password: "h4mmert9me"
+  password: "foo_password"
+
+import_config "#{config_env()}.exs"

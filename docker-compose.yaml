@@ -1,0 +1,21 @@
+version: '3.1'
+services:
+  rspamd:
+    image: a16bitsysop/rspamd
+    ports:
+      - 11332:11332
+      - 11334:11334
+    volumes:
+      - rspamd-var:/var/lib/rspamd
+      - rspamd-over:/etc/rspamd/override.d
+      - /tmp/rspamd_ex/:/tmp/rspamd_ex
+    environment:
+      REDIS: redis
+      PASSWORD: "foo_password"
+  
+  redis: 
+    image: redis
+
+volumes:
+  rspamd-var:
+  rspamd-over:

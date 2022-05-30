@@ -1,21 +1,28 @@
 # RspamdEx
 
-**TODO: Add description**
+This is a small helper library for scanning emails with `rspamd`. It's useful in tandem with libraries such as [gen_smtp](https://github.com/gen-smtp/gen_smtp)
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `rspamd_ex` to your list of dependencies in `mix.exs`:
+Currently, the package is only available via git:
 
 ```elixir
 def deps do
   [
-    {:rspamd_ex, "~> 0.1.0"}
+    {:gettext, git: "https://github.com/michaeldelago/rspamd_ex.git", branch: "master"}`
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/rspamd_ex>.
+## Configuration
+
+```elixir
+import Config
+
+config :rspamd_ex,
+  host: "localhost",
+  port: 11334,
+  delete: true,
+  password: "PASSWORD_FOR_RSPAMD"
+```
 
