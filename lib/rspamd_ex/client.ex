@@ -75,23 +75,26 @@ defmodule RspamdEx.Client do
   end
 
   defp run_command(state, filepath) do
-    if Keyword.has_key?(state, :password) do
-      System.cmd(Keyword.get(state, :executable), [
+    args = if Keyword.has_key?(state, :password) do
+      [
         "--json",
         "--password",
+        Keyword.get(state, :password),
         "--connect",
         "#{Keyword.get(state, :host)}:#{Keyword.get(state, :port)}",
-        Keyword.get(state, :password),
         "symbols",
         filepath
-      ])
+      ]
     else
-      System.cmd(Keyword.get(state, :executable), [
-        "-j",
+      [
+        "--json",
+        "--connect",
+        "#{Keyword.get(state, :host)}:#{Keyword.get(state, :port)}",
         "symbols",
         filepath
-      ])
+      ]
     end
+    System.cmd(Keyword.get(state, :executable), args)
   end
 
   defp write_file(message, path) do
