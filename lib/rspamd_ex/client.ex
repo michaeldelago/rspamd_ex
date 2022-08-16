@@ -18,12 +18,12 @@ defmodule RspamdEx.Client do
 
   @spec scan_message(binary) :: {:error, any} | {:ok, RspamdEx.Client.ScanResults}
   def scan_message(message) when is_binary(message) do
-    GenServer.call(__MODULE__, {:scan, message})
+    GenServer.call(__MODULE__, {:scan, message}, Application.get_env(:rspamd_ex, :scan_timeout_seconds, 60000))
   end
 
   def scan_file(filename) do
     if File.exists?(filename) do
-      GenServer.call(__MODULE__, {:scan_file, filename})
+      GenServer.call(__MODULE__, {:scan_file, filename}, Application.get_env(:rspamd_ex, :scan_timeout_seconds, 60000))
     else
       Logger.error(["File ", filename, " doesn't appear to exist."])
       {:error, :enoent}
