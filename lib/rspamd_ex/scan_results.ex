@@ -12,10 +12,12 @@ defmodule RspamdEx.Client.ScanResults do
             symbols: %{},
             time_real: 0.0
 
-  def spam?(%__MODULE__{} = results) do
+  @spec spam?(%{required_score: integer(), score: integer()}) :: boolean()
+  def spam?(results) do
     results.required_score < results.score
   end
 
+  @spec ham?(%{required_score: integer(), score: integer()}) :: boolean()
   def ham?(%__MODULE__{} = results) do
     !spam?(results)
   end
